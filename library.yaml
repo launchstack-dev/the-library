@@ -10,6 +10,70 @@ default_dirs:
     - global: ~/.claude/commands/
 
 library:
-  skills: []
-  agents: []
-  prompts: []
+  skills:
+    - name: execution-protocols
+      description: Inter-agent protocol schemas for the meta-orchestration execution pipeline (AgentResult, state.json, execution conventions)
+      source: /Users/jensencarlsen/.claude/agents/protocols/execution-conventions.md
+
+  agents:
+    # Planning agents
+    - name: feature-coverage-agent
+      description: Audits plan schema, API surface, and features against competitors
+      source: /Users/jensencarlsen/.claude/agents/feature-coverage-agent.md
+
+    - name: strategy-ux-agent
+      description: Evaluates positioning, UX, theming, and developer ergonomics
+      source: /Users/jensencarlsen/.claude/agents/strategy-ux-agent.md
+
+    - name: phasing-agent
+      description: Reviews phase boundaries, dependencies, and sequencing risks
+      source: /Users/jensencarlsen/.claude/agents/phasing-agent.md
+
+    - name: parallelization-agent
+      description: Designs multi-agent execution waves and merge strategy
+      source: /Users/jensencarlsen/.claude/agents/parallelization-agent.md
+
+    - name: agentic-workflow-agent
+      description: Decomposes phases into context-bounded tasks for AI agents
+      source: /Users/jensencarlsen/.claude/agents/agentic-workflow-agent.md
+
+    # Execution agents
+    - name: contracts-agent
+      description: Wave 0 specialist - creates shared types, interfaces, schemas
+      source: /Users/jensencarlsen/.claude/agents/contracts-agent.md
+      requires: [skill:execution-protocols]
+
+    - name: implementer-agent
+      description: Parallel worker within file ownership boundaries
+      source: /Users/jensencarlsen/.claude/agents/implementer-agent.md
+      requires: [skill:execution-protocols]
+
+    - name: wiring-agent
+      description: Post-wave integration - barrel files, routes, imports, deps
+      source: /Users/jensencarlsen/.claude/agents/wiring-agent.md
+      requires: [skill:execution-protocols]
+
+    - name: verification-agent
+      description: Quality gate - typecheck, tests, lint, ownership drift
+      source: /Users/jensencarlsen/.claude/agents/verification-agent.md
+      requires: [skill:execution-protocols]
+
+    # Utility agents
+    - name: meta-agent
+      description: Generates new Claude Code agents, skills, and commands
+      source: /Users/jensencarlsen/.claude/agents/meta-agent.md
+
+    - name: tdd-coach
+      description: Drives test-driven development with red-green-refactor
+      source: /Users/jensencarlsen/.claude/agents/tdd-coach.md
+
+  prompts:
+    - name: review-plan
+      description: Launches 5 planning agents in parallel to review a PLAN.md
+      source: /Users/jensencarlsen/.claude/commands/review-plan.md
+      requires: [agent:feature-coverage-agent, agent:strategy-ux-agent, agent:phasing-agent, agent:parallelization-agent, agent:agentic-workflow-agent]
+
+    - name: execute-plan
+      description: Wave-by-wave execution orchestrator with human approval gates
+      source: /Users/jensencarlsen/.claude/commands/execute-plan.md
+      requires: [agent:contracts-agent, agent:implementer-agent, agent:wiring-agent, agent:verification-agent, skill:execution-protocols]
