@@ -11,13 +11,52 @@ default_dirs:
 
 library:
   skills:
-    - name: execution-protocols
-      description: Inter-agent protocol schemas for the meta-orchestration execution pipeline (AgentResult, state, execution conventions)
+    # Core execution protocols
+    - name: execution-conventions
+      description: Shared rules for execution agents and orchestrators - directory structure, file ownership, context injection, atomic writes
       source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/protocols/execution-conventions.md
 
-    - name: pattern-executor-protocol
-      description: Reusable runtime for debate, chain, vote, triage orchestration patterns with budget accounting
+    - name: toon-format
+      description: Token-Oriented Object Notation spec - 30-60% token reduction vs JSON for all runtime artifacts
+      source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/protocols/toon-format.md
+
+    # Schema definitions
+    - name: agent-result-schema
+      description: Schema for structured agent output - status, files changed, exports added, issues found
+      source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/protocols/agent-result.schema.md
+
+    - name: state-schema
+      description: Schema for execution state tracking - waves, tasks, agent assignments, verification results
+      source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/protocols/state.schema.md
+
+    - name: plan-schema
+      description: Schema for PLAN.md structure - phases, tasks, deliverables, acceptance criteria
+      source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/protocols/plan.schema.md
+
+    - name: pipeline-state-schema
+      description: Schema for autonomous pipeline state - iteration count, stage history, failure log, agent budget
+      source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/protocols/pipeline-state.schema.md
+
+    - name: agent-monitoring-schema
+      description: Schema for agent progress reporting - heartbeats, phase lifecycle, stale detection, escalation
+      source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/protocols/agent-monitoring.schema.md
+
+    - name: orchestration-config-schema
+      description: Schema for orchestration.toml project config - custom agents, patterns, testing hooks
+      source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/protocols/orchestration-config.schema.md
+
+    # Pattern and validation protocols
+    - name: orchestration-patterns
+      description: Debate, chain, vote, triage pattern definitions - when to use each, configuration, integration points
+      source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/protocols/orchestration-patterns.md
+
+    - name: pattern-executor
+      description: Reusable runtime for invoking orchestration patterns - trigger matching, per-pattern execution, budget accounting
       source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/protocols/pattern-executor.md
+
+    - name: validation-rules
+      description: Plan validation logic - 4-stage validation pipeline for PLAN.md structural and semantic checks
+      source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/protocols/validation-rules.md
 
   agents:
     # Planning agents
@@ -45,22 +84,22 @@ library:
     - name: contracts-agent
       description: Wave 0 specialist - creates shared types, interfaces, schemas
       source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/contracts-agent.md
-      requires: [skill:execution-protocols]
+      requires: [skill:execution-conventions, skill:agent-result-schema]
 
     - name: implementer-agent
       description: Parallel worker within file ownership boundaries
       source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/implementer-agent.md
-      requires: [skill:execution-protocols]
+      requires: [skill:execution-conventions, skill:agent-result-schema]
 
     - name: wiring-agent
       description: Post-wave integration - barrel files, routes, imports, deps
       source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/wiring-agent.md
-      requires: [skill:execution-protocols]
+      requires: [skill:execution-conventions, skill:agent-result-schema]
 
     - name: verification-agent
       description: Quality gate - typecheck, tests, lint, ownership drift
       source: https://github.com/launchstack-dev/meta-orchestration/blob/main/agents/verification-agent.md
-      requires: [skill:execution-protocols]
+      requires: [skill:execution-conventions, skill:agent-result-schema]
 
     # Testing agents
     - name: acceptance-criteria-agent
@@ -129,7 +168,7 @@ library:
     - name: loom-execute-plan
       description: Wave-by-wave execution orchestrator with automated quality gates
       source: https://github.com/launchstack-dev/meta-orchestration/blob/main/commands/loom-execute-plan.md
-      requires: [agent:contracts-agent, agent:implementer-agent, agent:wiring-agent, agent:verification-agent, skill:execution-protocols]
+      requires: [agent:contracts-agent, agent:implementer-agent, agent:wiring-agent, agent:verification-agent, skill:execution-conventions, skill:state-schema]
 
     - name: loom-test-plan
       description: Testing pipeline - acceptance criteria, unit tests, E2E tests with Playwright
